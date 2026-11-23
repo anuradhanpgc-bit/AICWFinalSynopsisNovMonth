@@ -1,0 +1,2 @@
+# AICWFinalSynopsisNovMonth
+AI Startup Sathi
