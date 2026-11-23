@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Startup Saathi — Pilot Insight Dashboard (56 synthetic respondents)</title>
+<style>
+  :root{
+    --bg:#0e0b1f; --panel:rgba(255,255,255,.055); --panel2:rgba(255,255,255,.04);
+    --ink:#f4f2ff; --muted:#a9a3c9; --line:rgba(255,255,255,.10);
+    --p1:#ff4d8d; --p2:#ff9f43; --p3:#ffd93d; --p4:#38e8a6; --p5:#2ec5ff;
+    --p6:#8b7dff; --p7:#ff6f61; --p8:#00d4c8;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:26px 22px 46px; color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:
+      radial-gradient(1100px 620px at 8% -8%, #2b1360 0%, transparent 58%),
+      radial-gradient(950px 560px at 92% 0%, #06364a 0%, transparent 55%),
+      radial-gradient(900px 700px at 55% 108%, #3a0d3d 0%, transparent 60%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:1400px;margin:0 auto}
+  /* ---------- header ---------- */
+  header{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+  .brand{display:flex;gap:14px;align-items:center}
+  .logo{
+    width:56px;height:56px;border-radius:18px;flex:0 0 auto;
+    background:conic-gradient(from 210deg,#ff4d8d,#ff9f43,#ffd93d,#38e8a6,#2ec5ff,#8b7dff,#ff4d8d);
+    display:grid;place-items:center;font-size:26px;
+    box-shadow:0 12px 34px rgba(139,125,255,.5);
+  }
+  h1{font-size:clamp(24px,3.2vw,38px);line-height:1.05;margin:0;letter-spacing:-.8px;font-weight:800}
+  h1 span{background:linear-gradient(96deg,#ff9f43,#ff4d8d 38%,#8b7dff 68%,#2ec5ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);font-size:14px;margin-top:7px}
+  .pillrow{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    padding:8px 13px;border-radius:999px;border:1px solid var(--line);
+    background:rgba(255,255,255,.06);color:#ddd8ff;backdrop-filter:blur(8px)}
+  .pill.warn{background:linear-gradient(90deg,rgba(255,159,67,.22),rgba(255,77,141,.22));border-color:rgba(255,159,67,.45);color:#ffd9b0}
+  /* ---------- kpis ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:13px;margin-bottom:16px}
+  .kpi{position:relative;overflow:hidden;border-radius:20px;padding:17px 16px 15px;
+    background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(12px)}
+  .kpi::after{content:'';position:absolute;inset:auto -30px -60px auto;width:120px;height:120px;border-radius:50%;
+    background:var(--c);filter:blur(34px);opacity:.42}
+  .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700;position:relative}
+  .kpi .val{font-size:36px;font-weight:800;letter-spacing:-1.4px;margin:6px 0 2px;position:relative;
+    background:linear-gradient(180deg,#fff,var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kpi .note{font-size:11.5px;color:#cfc9ee;position:relative;line-height:1.35}
+  .kpi .spark{position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--c),transparent)}
+  /* ---------- grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px 17px 14px;
+    backdrop-filter:blur(12px);position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;top:0;left:18px;right:18px;height:2px;border-radius:0 0 4px 4px;
+    background:linear-gradient(90deg,var(--a),transparent 85%);opacity:.85}
+  .card h3{margin:2px 0 2px;font-size:14.5px;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+  .card h3 .dot{width:9px;height:9px;border-radius:50%;background:var(--a);box-shadow:0 0 12px var(--a)}
+  .card .hint{font-size:11.5px;color:var(--muted);margin:0 0 13px;line-height:1.4}
+  .c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}
+  .c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+  /* ---------- bars ---------- */
+  .bars{display:flex;flex-direction:column;gap:9px}
+  .bar{display:grid;grid-template-columns:1fr auto;gap:0 8px;align-items:center}
+  .bar .name{font-size:12px;color:#e7e3ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .num{font-size:11.5px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+  .bar .track{grid-column:1/-1;height:8px;border-radius:99px;background:rgba(255,255,255,.075);overflow:hidden}
+  .bar .fill{height:100%;border-radius:99px;transition:width .9s cubic-bezier(.2,.8,.2,1),filter .2s}
+  .bar:hover .fill{filter:brightness(1.25) saturate(1.2)}
+  .bar:hover .name{color:#fff}
+  .vbar{display:flex;align-items:flex-end;gap:10px;height:168px;margin-top:6px}
+  .vcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+  .vcol .vval{font-size:12px;font-weight:800;color:#fff}
+  .vcol .vbarx{width:100%;border-radius:9px 9px 4px 4px;transition:filter .2s;min-height:6px}
+  .vcol:hover .vbarx{filter:brightness(1.22)}
+  .vcol .vlab{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.2}
+  /* ---------- donut ---------- */
+  .donutwrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .donutwrap svg{flex:0 0 auto;overflow:visible}
+  .donut .seg{transition:opacity .2s,stroke-width .2s;cursor:pointer}
+  .donut:hover .seg{opacity:.55}
+  .donut .seg:hover{opacity:1;stroke-width:20}
+  .legend{display:flex;flex-direction:column;gap:7px;flex:1;min-width:130px}
+  .lg{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#ded9f7}
+  .lg .sw{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+  .lg b{margin-left:auto;font-variant-numeric:tabular-nums;color:#fff;font-weight:800}
+  .centerbig{font-size:23px;font-weight:800;fill:#fff}
+  .centersm{font-size:9px;fill:#a9a3c9;letter-spacing:.6px;text-transform:uppercase}
+  /* ---------- heatmap ---------- */
+  .hm{border-collapse:separate;border-spacing:5px;width:100%}
+  .hm th{font-size:10.5px;color:var(--muted);font-weight:700;text-align:center;padding:2px;line-height:1.2}
+  .hm th.rh{text-align:right;padding-right:8px;white-space:nowrap}
+  .hm td{height:34px;border-radius:9px;text-align:center;font-size:11.5px;font-weight:800;color:#fff;transition:transform .15s}
+  .hm td:hover{transform:scale(1.06);outline:1px solid rgba(255,255,255,.5)}
+  /* ---------- chips ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-size:11.5px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);
+    background:rgba(255,255,255,.05);display:flex;gap:6px;align-items:center}
+  .chip b{color:#fff}
+  .chip .dot2{width:7px;height:7px;border-radius:50%}
+  /* ---------- insights ---------- */
+  .insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin-top:16px}
+  .ins{border-radius:18px;padding:15px 16px;border:1px solid var(--line);background:var(--panel2);position:relative;overflow:hidden}
+  .ins::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--a)}
+  .ins h4{margin:0 0 6px;font-size:13px;display:flex;gap:8px;align-items:center}
+  .ins h4 .ic{font-size:11px;color:var(--a);line-height:1}
+  .ins p{margin:0;font-size:12px;color:#c6c0e6;line-height:1.55}
+  .ins p b{color:#fff}
+  footer{margin-top:22px;font-size:11px;color:#8b84ad;line-height:1.6;border-top:1px solid var(--line);padding-top:14px}
+  .tooltip{position:fixed;pointer-events:none;z-index:99;background:#1b1436;border:1px solid rgba(255,255,255,.2);
+    padding:7px 10px;border-radius:10px;font-size:11.5px;color:#fff;opacity:0;transition:opacity .12s;
+    box-shadow:0 10px 26px rgba(0,0,0,.5);max-width:240px;line-height:1.4}
+  @media(max-width:1100px){.c3,.c4,.c5,.c6,.c7,.c8{grid-column:span 6}}
+  @media(max-width:700px){.c3,.c4,.c5,.c6,.c7,.c8{grid-column:span 12}}
+
+  .split2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .statline{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:#c6c0e6;margin-top:10px}
+  .statline b{color:#fff}
+  .note{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:11.5px;	color:#c6c0e6;line-height:1.5}
+  .note b{color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">🚀</div>
+      <div>
+        <h1>AI Startup Saathi <span>·&nbsp; Pilot Insight Dashboard</span></h1>
+        <div class="sub">56 synthetic respondents &middot; entrepreneurial stage, challenges, and demand for AI-guided support</div>
+      </div>
+    </div>
+    <div class="pillrow">
+      <div class="pill">n = 56 respondents</div>
+      <div class="pill">22 attributes</div>
+      <div class="pill warn">&nbsp;⚠&nbsp; Simulated data — prototype only</div>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <section class="card c5" style="--a:var(--p5)">
+      <h3><span class="dot"></span>Current entrepreneurial stage</h3>
+      <p class="hint">Pre-launch dominates: 52 of 56 are not yet running a venture.</p>
+      <div class="bars" id="stage"></div>
+    </section>
+
+    <section class="card c4" style="--a:var(--p1)">
+      <h3><span class="dot"></span>Most urgent challenge</h3>
+      <p class="hint">Customer-problem clarity outranks every other single pain point.</p>
+      <div class="bars" id="urgent"></div>
+    </section>
+
+    <section class="card c3" style="--a:var(--p4)">
+      <h3><span class="dot"></span>Interest in AI Startup Saathi</h3>
+      <p class="hint">Stated adoption intent</p>
+      <div class="donutwrap" id="adopt"></div>
+    </section>
+
+    <section class="card c5" style="--a:var(--p7)">
+      <h3><span class="dot"></span>Challenges selected <span style="font-size:11px;color:var(--muted);font-weight:600">(multi-select, top 10)</span></h3>
+      <p class="hint">Mentor access and customer-problem identification are near-universal.</p>
+      <div class="bars" id="challenges"></div>
+    </section>
+
+    <section class="card c4" style="--a:var(--p2)">
+      <h3><span class="dot"></span>Support needs selected <span style="font-size:11px;color:var(--muted);font-weight:600">(multi-select)</span></h3>
+      <p class="hint">Idea validation is the single biggest ask.</p>
+      <div class="bars" id="support"></div>
+    </section>
+
+    <section class="card c3" style="--a:var(--p6)">
+      <h3><span class="dot"></span>AI tools already used</h3>
+      <p class="hint">Familiarity is broad but shallow.</p>
+      <div class="donutwrap" id="tools"></div>
+      <div class="note">52 of 56 report using at least one tool (Excel included); ChatGPT (24) and Canva AI (21) lead
+      and only 4 have used none. Familiarity exists — structured, entrepreneurial use does not.</div>
+    </section>
+
+    <section class="card c5" style="--a:var(--p3)">
+      <h3><span class="dot"></span>Preferred AI features <span style="font-size:11px;color:var(--muted);font-weight:600">(multi-select, top 10)</span></h3>
+      <p class="hint">Discovery tools beat growth tools in demand.</p>
+      <div class="bars" id="features"></div>
+    </section>
+
+    <section class="card c4" style="--a:var(--p1)">
+      <h3><span class="dot"></span>Main AI concern</h3>
+      <p class="hint">Access and privacy, not just price.</p>
+      <div class="bars" id="concern"></div>
+      <div class="note">Internet/device access and privacy together account for <b>36%</b> of main concerns —
+      build lightweight, low-data, private-by-default flows.</div>
+    </section>
+
+    <section class="card c3" style="--a:var(--p8)">
+      <h3><span class="dot"></span>Preferred guidance language</h3>
+      <p class="hint">Bilingual is the default</p>
+      <div class="donutwrap" id="lang"></div>
+      <div class="note">49 of 56 want Hindi in some form; 38 want both languages.
+      English-only guidance would exclude most of this sample.</div>
+    </section>
+
+    <section class="card c7" style="--a:var(--p5)">
+      <h3><span class="dot"></span>AI confidence × stated adoption interest</h3>
+      <p class="hint">Even respondents at confidence 1–2 mostly say yes — the barrier is onboarding, not willingness.</p>
+      <div id="heat"></div>
+    </section>
+
+    <section class="card c5" style="--a:var(--p2)">
+      <h3><span class="dot"></span>Confidence &amp; mentor access (1–5)</h3>
+      <p class="hint">Both distributions lean low-to-middle.</p>
+      <div class="split2">
+        <div><div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">AI confidence</div><div id="d1"></div></div>
+        <div><div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Mentor access ease</div><div id="d2"></div></div>
+      </div>
+      <div class="statline" id="diststats"></div>
+      <div class="note">A third of the sample rates mentor access 1–2 of 5 while <b>77%</b> name mentors as a challenge
+      and <b>75%</b> want idea validation. Pair AI guidance with a real human escalation path.</div>
+    </section>
+
+    <section class="card c4" style="--a:var(--p6)">
+      <h3><span class="dot"></span>Preferred business type</h3>
+      <p class="hint">Services, social and food ventures lead; 10 are undecided.</p>
+      <div class="bars" id="biztype"></div>
+    </section>
+
+    <section class="card c4" style="--a:var(--p4)">
+      <h3><span class="dot"></span>Primary motivation</h3>
+      <p class="hint">Livelihood and community motives dominate.</p>
+      <div class="bars" id="motivation"></div>
+    </section>
+
+    <section class="card c4" style="--a:var(--p3)">
+      <h3><span class="dot"></span>Weekly time available</h3>
+      <p class="hint">Design micro-sessions, not courses.</p>
+      <div class="donutwrap" id="time"></div>
+      <div class="note">41 of 56 can give under two hours a week, and 17 have under 30 minutes.
+      Sessions must complete one useful task, not a lesson.</div>
+    </section>
+
+    <section class="card c5" style="--a:var(--p1)">
+      <h3><span class="dot"></span>Who is in the sample</h3>
+      <p class="hint">Discipline, study year and entrepreneurial family background.</p>
+      <div class="donutwrap" id="field"></div>
+      <div style="height:11px"></div>
+      <div class="chips" id="profilechips"></div>
+    </section>
+
+    <section class="card c7" style="--a:var(--p8)">
+      <h3><span class="dot"></span>Desired primary outcome</h3>
+      <p class="hint">What success looks like to the respondent.</p>
+      <div class="bars" id="outcome"></div>
+    </section>
+  </div>
+
+  <div class="insights" id="insights"></div>
+
+  <footer>
+    <b>Source:</b> AI_Startup_Saathi_56_Synthetic_Respondents.xlsx — Respondent_Data (56 records, 22 fields).<br>
+    <b>Important:</b> all records are <b>synthetic demonstration data</b>, not real survey responses. Treat every figure as a prototype assumption, not evidence of beneficiary need. Replace with consent-based responses before reporting, and state sample size, method and collection date.
+  </footer>
+</div>
+<div class="tooltip" id="tt"></div>
+
+<script>
+const D = {"n": 56, "kpi": {"n": 56, "firstgen": 33, "firstgen_notsure": 16, "will": 47, "interest": 4.27, "aiconf": 2.88, "mentor": 2.8, "highinterest": 44, "lowmentor": 22, "lowconf": 21, "noventure": 52, "valid_support": 42, "survey_feature": 41, "mentor_challenge": 43, "tools_users": 52}, "stage": [{"k": "Exploring whether idea is practical", "v": 14}, {"k": "Have a business idea; no action taken", "v": 13}, {"k": "Interested but no business idea yet", "v": 11}, {"k": "Prepared a basic business model", "v": 8}, {"k": "Discussed idea with potential customers", "v": 6}, {"k": "Already running a small venture", "v": 4}], "urgent": [{"k": "Identifying a real customer problem", "v": 14}, {"k": "Finding an experienced mentor", "v": 6}, {"k": "Limited professional networks", "v": 5}, {"k": "Conducting market research", "v": 5}, {"k": "Estimating costs and setting prices", "v": 5}, {"k": "Balancing studies and other responsibilities", "v": 3}, {"k": "Marketing a product/service", "v": 3}, {"k": "Finding potential customers", "v": 3}, {"k": "Preparing a business plan", "v": 2}, {"k": "Lack of confidence/fear of failure", "v": 2}, {"k": "Understanding government schemes", "v": 2}, {"k": "Finding a suitable business idea", "v": 2}, {"k": "Understanding competitors", "v": 2}, {"k": "Using digital tools and AI", "v": 1}, {"k": "Accessing finance/funding information", "v": 1}], "challenges": [{"k": "Finding an experienced mentor", "v": 43}, {"k": "Identifying a real customer problem", "v": 36}, {"k": "Limited professional networks", "v": 20}, {"k": "Preparing a business plan", "v": 17}, {"k": "Estimating costs and setting prices", "v": 15}, {"k": "Understanding government schemes", "v": 13}, {"k": "Finding potential customers", "v": 11}, {"k": "Lack of confidence/fear of failure", "v": 10}, {"k": "Balancing studies and other responsibilities", "v": 10}, {"k": "Marketing a product/service", "v": 10}, {"k": "Finding a suitable business idea", "v": 9}, {"k": "Conducting market research", "v": 9}, {"k": "Understanding competitors", "v": 9}, {"k": "Accessing finance/funding information", "v": 8}, {"k": "Using digital tools and AI", "v": 6}], "support": [{"k": "Business idea validation", "v": 49}, {"k": "Networking with entrepreneurs", "v": 18}, {"k": "Funding and government scheme guidance", "v": 15}, {"k": "Financial planning and pricing support", "v": 13}, {"k": "Step-by-step startup guidance", "v": 12}, {"k": "Women entrepreneur role models", "v": 12}, {"k": "Practical AI workshops", "v": 11}, {"k": "One-to-one mentoring", "v": 10}, {"k": "Customer and market research training", "v": 10}, {"k": "Digital marketing training", "v": 10}, {"k": "Pitch preparation", "v": 8}], "features": [{"k": "Customer survey/interview generator", "v": 52}, {"k": "AI problem validator", "v": 44}, {"k": "Verified schemes/incubator guide", "v": 19}, {"k": "Customer feedback analysis", "v": 19}, {"k": "Pitch preparation coach", "v": 17}, {"k": "Market and competitor research assistant", "v": 16}, {"k": "Business Model Canvas coach", "v": 14}, {"k": "Progress tracker", "v": 13}, {"k": "Marketing and branding assistant", "v": 11}, {"k": "Costing/pricing/break-even calculator", "v": 11}, {"k": "Human mentor connection", "v": 8}], "tools": [{"k": "ChatGPT", "v": 24}, {"k": "Canva AI", "v": 21}, {"k": "Excel", "v": 16}, {"k": "Copilot", "v": 10}, {"k": "None yet", "v": 4}], "concern": [{"k": "No major concern", "v": 11}, {"k": "Internet/device access", "v": 11}, {"k": "Privacy/data security", "v": 9}, {"k": "Cost of paid tools", "v": 8}, {"k": "Do not know how to write prompts", "v": 7}, {"k": "Incorrect AI information", "v": 6}, {"k": "Difficulty using AI tools", "v": 4}], "lang": [{"k": "Hindi and English", "v": 38}, {"k": "Hindi", "v": 11}, {"k": "English", "v": 7}], "adopt": [{"k": "Probably yes", "v": 24}, {"k": "Definitely yes", "v": 23}, {"k": "Not sure", "v": 8}, {"k": "Probably no", "v": 1}], "time": [{"k": "1\u20132 hours", "v": 18}, {"k": "Less than 30 minutes", "v": 17}, {"k": "3\u20134 hours", "v": 15}, {"k": "30 minutes to 1 hour", "v": 6}], "biztype": [{"k": "Not decided yet", "v": 10}, {"k": "Online business/e-commerce", "v": 8}, {"k": "Social enterprise", "v": 7}, {"k": "Food/bakery/products", "v": 7}, {"k": "Digital/creative services", "v": 7}, {"k": "Sustainable products", "v": 6}, {"k": "Education/skill development", "v": 5}, {"k": "Fashion/beauty/lifestyle", "v": 5}, {"k": "Handicrafts/local products", "v": 1}], "motivation": [{"k": "Creating employment", "v": 15}, {"k": "Solving a community problem", "v": 11}, {"k": "Financial independence", "v": 9}, {"k": "Flexible work", "v": 7}, {"k": "Supporting family", "v": 7}, {"k": "Turning passion into business", "v": 7}], "outcome": [{"k": "Prepare a financial plan", "v": 14}, {"k": "Prepare a startup pitch", "v": 10}, {"k": "Understand target customers", "v": 9}, {"k": "Become more confident", "v": 8}, {"k": "Validate my business idea", "v": 8}, {"k": "Develop a business model", "v": 7}], "field": [{"k": "Commerce", "v": 23}, {"k": "Arts/Humanities", "v": 12}, {"k": "Banking and Finance", "v": 10}, {"k": "Management", "v": 9}, {"k": "Science", "v": 2}], "year": [{"k": "First year", "v": 16}, {"k": "Postgraduate", "v": 15}, {"k": "Second year", "v": 14}, {"k": "Third year", "v": 11}], "family": [{"k": "No", "v": 45}, {"k": "Yes", "v": 11}], "aiconf": [{"k": 3, "v": 20}, {"k": 2, "v": 15}, {"k": 4, "v": 10}, {"k": 1, "v": 6}, {"k": 5, "v": 5}], "mentor_dist": [{"k": 3, "v": 20}, {"k": 2, "v": 14}, {"k": 4, "v": 9}, {"k": 1, "v": 8}, {"k": 5, "v": 5}], "interest_dist": [{"k": 5, "v": 27}, {"k": 4, "v": 17}, {"k": 3, "v": 12}], "heat": {"rows": ["1", "2", "3", "4", "5"], "cols": ["Definitely yes", "Probably yes", "Not sure", "Probably no"], "m": [[4, 2, 0, 0], [4, 8, 3, 0], [10, 7, 2, 1], [4, 3, 3, 0], [1, 4, 0, 0]]}};
+const PAL = ['#ff4d8d','#ff9f43','#ffd93d','#38e8a6','#2ec5ff','#8b7dff','#ff6f61','#00d4c8','#c084fc','#f472b6','#4ade80','#60a5fa'];
+const tt = document.getElementById('tt');
+function tip(e, html){ tt.innerHTML = html; tt.style.opacity = 1; move(e); }
+function move(e){ tt.style.left = Math.min(e.clientX + 14, innerWidth - 250) + 'px'; tt.style.top = (e.clientY + 16) + 'px'; }
+function hide(){ tt.style.opacity = 0; }
+document.addEventListener('mousemove', e => { if(+tt.style.opacity) move(e); });
+const pct = v => Math.round(v/D.n*100);
+
+/* KPI */
+const kpis = [
+  {lab:'Respondents', val:D.kpi.n, note:'synthetic student-entrepreneurs', c:'#8b7dff'},
+  {lab:'First-generation', val:pct(D.kpi.firstgen)+'%', note:D.kpi.firstgen+' say yes, '+D.kpi.firstgen_notsure+' unsure', c:'#ff4d8d'},
+  {lab:'Adoption intent', val:pct(D.kpi.will)+'%', note:'"definitely" or "probably yes"', c:'#38e8a6'},
+  {lab:'High interest', val:pct(D.kpi.highinterest)+'%', note:'rated 4–5 of 5 (mean '+D.kpi.interest.toFixed(2)+')', c:'#ffd93d'},
+  {lab:'Low mentor access', val:pct(D.kpi.lowmentor)+'%', note:'scored 1–2 of 5 on ease', c:'#ff9f43'},
+  {lab:'AI confidence', val:D.kpi.aiconf.toFixed(2), note:'mean of 5 — below midpoint', c:'#2ec5ff'}
+];
+document.getElementById('kpis').innerHTML = kpis.map(k=>`
+  <div class="kpi" style="--c:${k.c}">
+    <div class="lab">${k.lab}</div><div class="val">${k.val}</div>
+    <div class="note">${k.note}</div><div class="spark"></div>
+  </div>`).join('');
+
+/* bars */
+function hex2rgb(h){return [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));}
+function mix(a,b,t){const A=hex2rgb(a),B=hex2rgb(b);
+  return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+function bars(el, arr, start, end, unit){
+  const max = Math.max(...arr.map(a=>a.v));
+  const total = arr.reduce((s,a)=>s+a.v,0);
+  document.getElementById(el).innerHTML = arr.map((a,i)=>{
+    const col = mix(start,end,i/Math.max(1,arr.length-1));
+    const share = unit==='multi' ? pct(a.v) : Math.round(a.v/total*100);
+    const label = unit==='multi' ? share+'% of resp.' : share+'%';
+    return `<div class="bar" data-t="${a.k}: ${a.v}${unit==='multi'?' selections ('+share+'% of respondents)':' ('+share+'%)'}">
+      <div class="name">${a.k}</div><div class="num">${a.v} · ${label}</div>
+      <div class="track"><div class="fill" style="width:${Math.round(a.v/max*100)}%;background:linear-gradient(90deg,${col},${col}bb)"></div></div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('#'+el+' .bar').forEach(b=>{
+    b.addEventListener('mouseenter', e=>tip(e,b.dataset.t));
+    b.addEventListener('mouseleave', hide);
+  });
+}
+
+/* donut */
+function donut(el, arr, center, csub, colors){
+  const R=52, C=2*Math.PI*R, total=arr.reduce((s,a)=>s+a.v,0);
+  let off=0;
+  const segs = arr.map((a,i)=>{
+    const frac=a.v/total, len=frac*C, col=colors[i%colors.length];
+    const s=`<circle class="seg" cx="70" cy="70" r="${R}" fill="none" stroke="${col}"
+      stroke-width="17" stroke-linecap="butt"
+      stroke-dasharray="${Math.max(len-3,0.5)} ${C-len+3}" stroke-dashoffset="${-off}"
+      transform="rotate(-90 70 70)" data-t="${a.k}: ${a.v} (${pct(a.v)}%)"></circle>`;
+    off+=len; return s;
+  }).join('');
+  const el2=document.getElementById(el);
+  el2.innerHTML = `
+    <svg class="donut" width="140" height="140" viewBox="0 0 140 140">
+      <circle cx="70" cy="70" r="${R}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="17"></circle>
+      ${segs}
+      <text x="70" y="68" text-anchor="middle" class="centerbig">${center}</text>
+      <text x="70" y="85" text-anchor="middle" class="centersm">${csub}</text>
+    </svg>
+    <div class="legend">${arr.map((a,i)=>`<div class="lg"><span class="sw" style="background:${colors[i%colors.length]}"></span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px">${a.k}</span>
+      <b>${a.v}</b></div>`).join('')}</div>`;
+  el2.querySelectorAll('.seg').forEach(s=>{
+    s.addEventListener('mouseenter',e=>tip(e,s.dataset.t));
+    s.addEventListener('mouseleave',hide);
+  });
+}
+
+/* vertical bars for distributions */
+function vbars(el, series){
+  document.getElementById(el).innerHTML = `<div class="vbar">${series.map(s=>`
+    <div class="vcol" data-t="${s.lab}: ${s.v} respondents">
+      <div class="vval">${s.v}</div>
+      <div class="vbarx" style="height:${Math.max(4,Math.round(s.v/25*100))}%;background:linear-gradient(180deg,${s.c},${s.c}66)"></div>
+      <div class="vlab">${s.lab}</div>
+    </div>`).join('')}</div>`;
+  document.querySelectorAll('#'+el+' .vcol').forEach(c=>{
+    c.addEventListener('mouseenter',e=>tip(e,c.dataset.t));
+    c.addEventListener('mouseleave',hide);
+  });
+}
+
+/* render panels */
+bars('stage', D.stage, '#2ec5ff', '#8b7dff');
+bars('urgent', D.urgent.slice(0,8), '#ff4d8d', '#ff9f43');
+bars('challenges', D.challenges.slice(0,10), '#ff6f61', '#ff4d8d', 'multi');
+bars('support', D.support, '#ff9f43', '#ffd93d', 'multi');
+bars('features', D.features.slice(0,10), '#ffd93d', '#38e8a6', 'multi');
+bars('concern', D.concern, '#ff4d8d', '#8b7dff');
+bars('biztype', D.biztype.slice(0,8), '#c084fc', '#ff4d8d');
+bars('motivation', D.motivation, '#38e8a6', '#2ec5ff');
+bars('outcome', D.outcome, '#2ec5ff', '#38e8a6');
+
+donut('adopt', D.adopt, pct(D.kpi.will)+'%', 'SAY YES', ['#38e8a6','#2ec5ff','#ffd93d','#ff6f61']);
+donut('tools', D.tools, pct(D.kpi.tools_users)+'%', 'USE AI TOOLS', ['#ff4d8d','#ff9f43','#ffd93d','#8b7dff','#2ec5ff']);
+donut('lang', D.lang, pct(D.lang.find(l=>l.k==='Hindi and English').v), 'BILINGUAL', ['#ff9f43','#ff4d8d','#2ec5ff']);
+donut('time', D.time, '30%', 'UNDER 30M', ['#38e8a6','#2ec5ff','#ffd93d','#8b7dff']);
+donut('field', D.field, D.n, 'TOTAL', ['#ff4d8d','#8b7dff','#2ec5ff','#ff9f43','#38e8a6']);
+
+document.getElementById('profilechips').innerHTML = [
+  ['First-gen: yes', D.kpi.firstgen, '#ff4d8d'],
+  ['Not sure', D.kpi.firstgen_notsure, '#ffd93d'],
+  ['Family business', D.family.find(f=>f.k==='Yes').v, '#38e8a6'],
+  ['Third year', D.year.find(y=>y.k==='Third year').v, '#2ec5ff'],
+  ['Postgraduate', D.year.find(y=>y.k==='Postgraduate').v, '#8b7dff']
+].map(([l,v,c])=>`<div class="chip"><span class="dot2" style="background:${c}"></span>${l} <b>${v}</b></div>`).join('');
+
+/* distributions */
+const conf = [1,2,3,4,5].map(i=>{const f=D.aiconf.find(a=>+a.k===i); return {lab:'Conf '+i, v:f?f.v:0, c:'#2ec5ff'};});
+const ment = [1,2,3,4,5].map(i=>{const f=D.mentor_dist.find(a=>+a.k===i); return {lab:'Ease '+i, v:f?f.v:0, c:'#ff4d8d'};});
+vbars('d1', conf); vbars('d2', ment);
+document.getElementById('diststats').innerHTML =
+  `<span>Mean AI confidence <b>${D.kpi.aiconf.toFixed(2)}/5</b></span>
+   <span>Mean mentor access <b>${D.kpi.mentor.toFixed(2)}/5</b></span>
+   <span><b>${Math.round(D.kpi.lowmentor/D.n*100)}%</b> find mentors hard to reach</span>`;
+
+/* heatmap */
+(function(){
+  const {rows, cols, m} = D.heat;
+  const max = Math.max(...m.flat());
+  let html = '<table class="hm"><tr><th class="rh">AI confidence</th>' + cols.map(c=>`<th>${c}</th>`).join('') + '<th>Total</th></tr>';
+  rows.forEach((r,ri)=>{
+    const tot = m[ri].reduce((a,b)=>a+b,0);
+    html += `<tr><th class="rh">${r} / 5</th>`;
+    m[ri].forEach((v,ci)=>{
+      const t = v/max;
+      const col = mix('#241b45', ci<2?'#38e8a6':'#ff9f43', 0.15+0.85*t);
+      html += `<td style="background:${col};color:${t>0.45?'#08131a':'#e8e4ff'}" title="${cols[ci]} · confidence ${r}: ${v} respondents">${v||'·'}</td>`;
+    });
+    html += `<td style="background:rgba(255,255,255,.06)">${tot}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('heat').innerHTML = html;
+})();
+
+/* insights */
+const insights = [
+  {ic:'&#9679;', a:'#ff4d8d', h:'Mentor access is the gate', p:'<b>77%</b> selected "finding an experienced mentor" and <b>39%</b> rate mentor access 1–2 of 5. Position Saathi as a bridge that ends in a real human connection, not a replacement for one.'},
+  {ic:'&#9670;', a:'#2ec5ff', h:'Validation is the product', p:'<b>75%</b> want business idea validation and <b>73%</b> want a customer survey/interview generator — the two highest multi-select counts in the workbook. This is the MVP core.'},
+  {ic:'&#9650;', a:'#ff9f43', h:'Customer problem outranks everything', p:'<b>25%</b> named "identifying a real customer problem" as their single most urgent challenge, ahead of mentors (11%). Lead onboarding with a problem-discovery question.'},
+  {ic:'&#9679;', a:'#38e8a6', h:'Intent is high, confidence is not', p:'<b>84%</b> would try the assistant while mean AI confidence is only <b>2.88/5</b>. Low-confidence respondents still lean "yes" — reduce effort at step one rather than explaining features.'},
+  {ic:'&#9670;', a:'#ffd93d', h:'Bilingual and time-poor', p:'<b>68%</b> prefer Hindi + English, and <b>73%</b> have under two hours a week (30% have under 30 minutes). Ship short, chat-style, voice-friendly guidance.'},
+  {ic:'&#9650;', a:'#8b7dff', h:'Barriers are practical, not attitudinal', p:'Top concerns are internet/device access (20%), privacy (16%) and paid-tool cost (14%). Offer a lightweight, low-data, free tier and explicit privacy controls.'}
+];
+document.getElementById('insights').innerHTML = insights.map(i=>`
+  <div class="ins" style="--a:${i.a}"><h4><span class="ic">${i.ic}</span>${i.h}</h4><p>${i.p}</p></div>`).join('');
+</script>
+</body>
+</html>
